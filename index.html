@@ -1,0 +1,1078 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Envoie ton highlight — visu</title>
+<meta name="description" content="Envoie ton meilleur highlight de basket. Les meilleurs passent sur @be.visu, avec ton nom. Gratuit, sans compte, ouvert à tous les joueurs francophones.">
+<meta name="theme-color" content="#000000">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Envoie ton highlight — visu">
+<meta property="og:description" content="Les meilleurs passent sur @be.visu, avec ton nom.">
+<meta property="og:locale" content="fr_BE">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23000'/%3E%3Cpath d='M14 18h9l9 20 9-20h9L37 46h-10z' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --noir: #000000;
+    --blanc: #FFFFFF;
+    --graphite: #1D1D1F;
+    --gris: #86868B;
+    --perle: #F5F5F7;
+    --filet: rgba(255, 255, 255, .12);
+    --surface: #0B0B0C;
+    --max: 1120px;
+    --ease: cubic-bezier(.2, .7, .2, 1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  [hidden] { display: none !important; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; scroll-padding-top: 72px; }
+  body {
+    background: var(--noir);
+    color: var(--blanc);
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-size: 17px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  a { color: inherit; }
+  :focus-visible { outline: 2px solid var(--blanc); outline-offset: 4px; border-radius: 4px; }
+  .wrap { max-width: var(--max); margin: 0 auto; padding: 0 32px; }
+  .skip { position: absolute; left: -9999px; top: 12px; background: var(--blanc); color: var(--noir); padding: 10px 16px; border-radius: 8px; z-index: 100; }
+  .skip:focus { left: 16px; }
+
+  /* Typo */
+  h1, h2, h3 { font-family: "Inter Tight", "Inter", sans-serif; letter-spacing: -0.04em; }
+  h1 { font-weight: 700; font-size: clamp(46px, 6.4vw, 84px); line-height: .98; }
+  h1 .sub { color: var(--gris); }
+  h2 { font-weight: 700; font-size: clamp(34px, 5vw, 60px); line-height: 1.02; }
+  .eyebrow { font-size: 13px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--gris); }
+  .lead { font-size: clamp(19px, 2vw, 22px); color: var(--gris); max-width: 30ch; line-height: 1.45; }
+  .muted { color: var(--gris); }
+
+  /* Boutons */
+  .btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 15px 28px; border-radius: 999px;
+    font-weight: 500; font-size: 16px; text-decoration: none;
+    transition: transform .3s var(--ease), background .3s, color .3s, opacity .3s;
+  }
+  .btn-primaire { background: var(--blanc); color: var(--noir); }
+  .btn-primaire:hover { transform: translateY(-1px); opacity: .9; }
+  .btn-primaire svg { transition: transform .3s var(--ease); }
+  .btn-primaire:hover svg { transform: translateX(3px); }
+  .btn-lien { color: var(--blanc); padding-left: 4px; padding-right: 4px; }
+  .btn-lien:hover { color: var(--gris); }
+  .btn-petit { padding: 9px 18px; font-size: 14px; }
+
+  /* En-tête */
+  .entete {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(0, 0, 0, .72);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 1px solid transparent;
+    transition: border-color .3s;
+  }
+  .entete.defile { border-bottom-color: var(--filet); }
+  .entete .wrap { height: 64px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+  .logo { display: block; line-height: 0; }
+  .logo svg { height: 28px; width: auto; }
+  .nav { display: flex; align-items: center; gap: 32px; font-size: 14px; }
+  .nav a:not(.btn) { text-decoration: none; color: var(--gris); transition: color .2s; }
+  .nav a:not(.btn):hover { color: var(--blanc); }
+
+  /* Maquette du post */
+  .post { justify-self: center; width: min(100%, 340px); }
+  .ecran {
+    position: relative; aspect-ratio: 9 / 16; border-radius: 34px; overflow: hidden;
+    background: radial-gradient(120% 70% at 50% 18%, #2A2A2D 0%, #111112 55%, #000 100%);
+    border: 1px solid var(--filet);
+    box-shadow: 0 40px 120px rgba(255, 255, 255, .06);
+  }
+  .ecran .terrain { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .ecran .haut {
+    position: absolute; top: 18px; left: 18px; right: 18px;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 12px; font-weight: 500;
+  }
+  .ecran .haut svg { height: 14px; width: auto; }
+  .ecran .bas { position: absolute; left: 20px; right: 20px; bottom: 22px; }
+  .ecran .credit { font-family: "Inter Tight", sans-serif; font-weight: 700; font-size: 26px; letter-spacing: -0.03em; line-height: 1.05; }
+  .ecran .credit span { display: block; font-family: "Inter", sans-serif; font-weight: 400; font-size: 13px; letter-spacing: 0; color: var(--gris); margin-top: 6px; }
+  .ecran .barre { margin-top: 16px; height: 2px; background: rgba(255, 255, 255, .18); border-radius: 2px; overflow: hidden; }
+  .ecran .barre i { display: block; height: 100%; width: 38%; background: var(--blanc); }
+  .post figcaption { margin-top: 16px; text-align: center; font-size: 13px; color: var(--gris); }
+
+  /* Sections */
+  .section { padding: 128px 0; }
+  .section + .section { border-top: 1px solid var(--filet); }
+  .tete { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: end; margin-bottom: 64px; }
+  .tete .eyebrow { margin-bottom: 16px; }
+  .tete > p { color: var(--gris); max-width: 42ch; justify-self: end; }
+
+
+  .criteres { list-style: none; display: grid; grid-template-columns: repeat(2, 1fr); column-gap: 64px; }
+  .criteres li { display: flex; justify-content: space-between; gap: 24px; padding: 22px 0; border-bottom: 1px solid var(--filet); }
+  .criteres li:nth-child(-n+2) { border-top: 1px solid var(--filet); }
+  .criteres b { font-weight: 500; }
+  .criteres span { color: var(--gris); text-align: right; }
+
+  .engagements { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .carte { background: var(--surface); border: 1px solid var(--filet); border-radius: 24px; padding: 36px; }
+  .carte h3 { font-size: 22px; font-weight: 700; margin-bottom: 20px; }
+  .carte ul { list-style: none; }
+  .carte li { padding: 12px 0 12px 28px; position: relative; color: var(--gris); border-top: 1px solid var(--filet); }
+  .carte li::before { content: ""; position: absolute; left: 0; top: 21px; width: 12px; height: 1.5px; background: var(--blanc); }
+  .carte.non li::before { background: var(--gris); }
+
+  /* Accordéons */
+  .acc details { border-bottom: 1px solid var(--filet); }
+  .acc details:first-child { border-top: 1px solid var(--filet); }
+  .acc summary {
+    list-style: none; cursor: pointer; padding: 26px 0;
+    font-size: 19px; font-weight: 500;
+    display: flex; justify-content: space-between; align-items: center; gap: 24px;
+  }
+  .acc summary::-webkit-details-marker { display: none; }
+  .acc summary::after {
+    content: ""; flex: none; width: 12px; height: 12px;
+    border-right: 1.5px solid var(--gris); border-bottom: 1.5px solid var(--gris);
+    transform: rotate(45deg) translate(-3px, -3px); transition: transform .3s var(--ease);
+  }
+  .acc details[open] summary::after { transform: rotate(-135deg) translate(-3px, -3px); }
+  .acc .rep { padding: 0 0 28px; color: var(--gris); max-width: 68ch; }
+  .legal { padding: 0 0 32px; color: var(--gris); font-size: 15px; max-width: 72ch; }
+  .legal h4 { color: var(--blanc); font-weight: 500; font-size: 15px; margin: 22px 0 4px; }
+  .legal h4:first-child { margin-top: 0; }
+  .legal p, .legal ul { margin-bottom: 8px; }
+  .legal ul { padding-left: 18px; }
+  .deux { display: grid; grid-template-columns: 1fr 2fr; gap: 64px; }
+
+  /* Appel final */
+  .final { padding: 160px 0; text-align: center; border-top: 1px solid var(--filet); }
+  .final .logo-grand { width: min(80%, 420px); height: auto; margin: 0 auto 56px; display: block; }
+  .final h2 { margin-bottom: 16px; }
+  .final p { color: var(--gris); margin-bottom: 40px; }
+
+  /* Pied de page */
+  .pied { border-top: 1px solid var(--filet); padding: 56px 0 40px; font-size: 14px; color: var(--gris); }
+  .pied .grille { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 32px; }
+  .pied .logo svg { height: 22px; }
+  .pied h4 { color: var(--blanc); font-size: 13px; font-weight: 500; margin-bottom: 14px; }
+  .pied ul { list-style: none; }
+  .pied li + li { margin-top: 8px; }
+  .pied a { text-decoration: none; transition: color .2s; }
+  .pied a:hover { color: var(--blanc); }
+  .pied .bas { margin-top: 56px; padding-top: 24px; border-top: 1px solid var(--filet); display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; font-size: 12px; }
+
+
+  /* Hero : l'accroche à gauche, la carte d'envoi à droite (dessous sur téléphone) */
+  .hero { padding: 72px 0 112px; }
+  .hero .wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 540px); gap: 72px; align-items: start; }
+  .accroche { position: sticky; top: 120px; padding-top: 24px; }
+  .hero h1 { font-size: clamp(44px, 5.4vw, 76px); }
+  .hero .eyebrow { margin-bottom: 24px; }
+  .hero .lead { margin-top: 24px; }
+  .atouts { list-style: none; display: flex; gap: 32px; margin-top: 44px; padding-top: 28px; border-top: 1px solid var(--filet); }
+  .atouts b { display: block; font-family: "Inter Tight", sans-serif; font-weight: 700; font-size: 20px; letter-spacing: -0.03em; }
+  .atouts span { font-size: 14px; color: var(--gris); }
+
+  /* Carte d'envoi */
+  .carte-envoi { background: var(--surface); border: 1px solid var(--filet); border-radius: 28px; padding: 32px; box-shadow: 0 40px 120px rgba(255, 255, 255, .04); }
+  .carte-envoi fieldset { border: 0; padding: 0 0 28px; margin: 0 0 28px; border-bottom: 1px solid var(--filet); min-width: 0; }
+  .carte-envoi fieldset[disabled] { opacity: .55; }
+  .carte-envoi legend { display: flex; align-items: center; gap: 12px; font-family: "Inter Tight", sans-serif; font-weight: 700; font-size: 22px; letter-spacing: -0.03em; margin-bottom: 20px; padding: 0; }
+  .num { display: inline-grid; place-items: center; width: 28px; height: 28px; border: 1px solid rgba(255, 255, 255, .3); border-radius: 50%; font-family: "Inter", sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0; }
+  .carte-envoi em { font-style: normal; color: #5C6272; margin-left: 6px; font-size: 12px; }
+
+  .depot {
+    display: flex; flex-direction: column; align-items: center; gap: 6px; position: relative; cursor: pointer;
+    border: 1px dashed rgba(255, 255, 255, .3); border-radius: 20px; padding: 36px 20px; text-align: center;
+    transition: border-color .2s, background .2s;
+  }
+  .depot:hover, .depot.survol { border-color: var(--blanc); background: rgba(255, 255, 255, .03); }
+  .depot:has(input:focus-visible) { outline: 2px solid var(--blanc); outline-offset: 3px; }
+  .depot input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
+  .depot b { font-weight: 600; font-size: 18px; margin-top: 6px; }
+  .depot span { color: var(--gris); font-size: 14px; }
+  .depot.invalide { border-color: var(--blanc); border-style: solid; }
+
+  .fichier { display: grid; grid-template-columns: 72px minmax(0, 1fr) auto; gap: 16px; align-items: center; border: 1px solid var(--filet); border-radius: 20px; padding: 14px; }
+  .fichier canvas { width: 72px; height: 72px; border-radius: 14px; background: #1A1E28; display: block; }
+  .fichier-txt b { display: block; font-weight: 500; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .fichier-txt span { display: block; color: var(--gris); font-size: 13px; }
+  .fichier-txt .etat { color: var(--blanc); margin-top: 6px; min-height: 20px; }
+  .fichier.refuse { border-color: var(--blanc); }
+  .barre-env { height: 3px; margin-top: 10px; background: rgba(255, 255, 255, .14); border-radius: 3px; overflow: hidden; }
+  .barre-env i { display: block; height: 100%; width: 0; background: var(--blanc); transition: width .25s linear; }
+  .lien { background: none; border: 0; color: var(--gris); font: inherit; font-size: 14px; cursor: pointer; padding: 10px 6px; text-decoration: underline; text-underline-offset: 4px; }
+  .lien:hover { color: var(--blanc); }
+
+  .champs { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .champ { display: flex; flex-direction: column; gap: 8px; font-size: 14px; color: var(--gris); min-width: 0; }
+  .champ.seul { margin-top: 20px; }
+  .champ input, .champ select {
+    font: inherit; font-size: 16px; color: var(--blanc); height: 52px;
+    background: #121419; border: 1px solid var(--filet); border-radius: 14px;
+    padding: 0 14px; width: 100%; transition: border-color .2s, background .2s;
+    -webkit-appearance: none; appearance: none;
+  }
+  .champ select {
+    background-image: linear-gradient(45deg, transparent 50%, var(--gris) 50%), linear-gradient(135deg, var(--gris) 50%, transparent 50%);
+    background-position: calc(100% - 21px) 50%, calc(100% - 16px) 50%;
+    background-size: 5px 5px; background-repeat: no-repeat; padding-right: 38px;
+  }
+  .champ input::placeholder { color: #4A4A4E; }
+  .champ input:focus, .champ select:focus { outline: none; border-color: var(--blanc); background: #16181E; }
+  .invalide input, .invalide select { border-color: var(--blanc); }
+  .msg { display: block; color: var(--blanc); font-size: 13px; margin-top: 2px; }
+  .msg::before { content: "↑ "; color: var(--gris); }
+
+  .choix { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 20px; }
+  .choix-titre { width: 100%; font-size: 14px; color: var(--gris); }
+  .choix label { position: relative; cursor: pointer; flex: 1 1 0; text-align: center; white-space: nowrap; padding: 14px 12px; border: 1px solid var(--filet); border-radius: 14px; font-size: 15px; transition: background .2s, color .2s, border-color .2s; }
+  .choix input { position: absolute; opacity: 0; pointer-events: none; }
+  .choix label:has(input:checked) { background: var(--blanc); color: var(--noir); border-color: var(--blanc); }
+  .choix label:has(input:focus-visible) { outline: 2px solid var(--blanc); outline-offset: 3px; }
+  .choix.invalide label { border-color: var(--blanc); }
+  .choix .msg { width: 100%; }
+
+  .case { display: flex; gap: 14px; align-items: flex-start; padding: 10px 0; margin-top: 8px; cursor: pointer; font-size: 14px; line-height: 1.45; color: var(--gris); flex-wrap: wrap; }
+  .case > span { flex: 1 1 0; min-width: 0; }
+  .case input {
+    flex: none; width: 22px; height: 22px; margin-top: 0; border: 1.5px solid var(--gris); border-radius: 7px;
+    -webkit-appearance: none; appearance: none; display: grid; place-items: center; cursor: pointer; transition: background .2s, border-color .2s;
+  }
+  .case input:checked { background: var(--blanc); border-color: var(--blanc); }
+  .case input:checked::after { content: ""; width: 10px; height: 5px; border-left: 2px solid var(--noir); border-bottom: 2px solid var(--noir); transform: translateY(-1px) rotate(-45deg); }
+  .case input:focus-visible { outline: 2px solid var(--blanc); outline-offset: 3px; }
+  .case a { color: var(--blanc); }
+  .case.invalide input { border-color: var(--blanc); }
+  .case.invalide > span { color: var(--blanc); }
+  .case .msg { flex-basis: 100%; padding-left: 36px; }
+  .parent { margin-top: 20px; padding: 20px; border: 1px solid var(--filet); border-radius: 18px; }
+  .aide { color: var(--gris); font-size: 14px; margin-bottom: 16px; }
+
+  .piege { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+  .envoi { display: flex; flex-direction: column; gap: 14px; }
+  .envoi .btn { border: 0; cursor: pointer; font-family: inherit; justify-content: center; height: 58px; font-size: 17px; font-weight: 600; }
+  .envoi .btn[disabled] { opacity: .7; cursor: default; transform: none; }
+  .erreur { color: var(--blanc); border-left: 2px solid var(--blanc); padding-left: 14px; font-size: 15px; }
+  .note { color: #5C6272; font-size: 13px; text-align: center; }
+
+  .merci { text-align: center; padding: 48px 8px; }
+  .merci:focus { outline: none; }
+  .merci h2 { margin: 24px 0 16px; }
+  .merci p { color: var(--gris); max-width: 36ch; margin: 0 auto 12px; }
+  .merci p.merci-cle { color: var(--blanc); font-size: 19px; font-weight: 500; line-height: 1.4; margin-bottom: 16px; }
+  .merci .ref b { color: var(--blanc); font-weight: 500; letter-spacing: .06em; }
+  .btn-contour { background: none; color: var(--blanc); border: 1px solid rgba(255, 255, 255, .3); cursor: pointer; font-family: inherit; margin-top: 20px; }
+  .btn-contour:hover { border-color: var(--blanc); }
+
+  /* Fonctionnement : les étapes à gauche, le résultat à droite */
+  .fonction { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 96px; align-items: center; }
+  .pas { list-style: none; margin-top: 48px; }
+  .pas li { display: flex; gap: 28px; padding: 28px 0; border-top: 1px solid var(--filet); }
+  .pas li:last-child { border-bottom: 1px solid var(--filet); }
+  .pas .n { font-family: "Inter Tight", sans-serif; font-weight: 600; font-size: 14px; color: var(--gris); padding-top: 6px; }
+  .pas h3 { font-size: 24px; font-weight: 700; }
+  .pas p { color: var(--gris); margin-top: 6px; max-width: 40ch; }
+  .fonction .post { width: 300px; }
+
+  /* Apparition au défilement (seulement si JS actif et mouvement autorisé) */
+  .js .apparait { opacity: 0; transform: translateY(16px); transition: opacity .8s var(--ease), transform .8s var(--ease); }
+  .js .apparait.vu { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .js .apparait { opacity: 1; transform: none; transition: none; }
+    .btn, .btn svg { transition: none; }
+  }
+
+  /* Tablette */
+  @media (max-width: 960px) {
+    .hero { padding: 40px 0 88px; }
+    .hero .wrap { grid-template-columns: 1fr; gap: 40px; }
+    .accroche { position: static; padding-top: 0; }
+    .atouts { margin-top: 28px; padding-top: 20px; }
+    .tete, .deux, .fonction { grid-template-columns: 1fr; }
+    .tete > p { justify-self: start; }
+    .fonction { gap: 56px; }
+    .fonction .post { justify-self: center; }
+  }
+  /* Téléphone */
+  @media (max-width: 640px) {
+    .wrap { padding: 0 16px; }
+    .nav a:not(.btn) { display: none; }
+    .hero { padding: 28px 0 72px; }
+    .hero h1 { font-size: 42px; }
+    .hero .eyebrow { margin-bottom: 16px; font-size: 12px; }
+    .hero .lead { font-size: 18px; margin-top: 16px; max-width: none; }
+    .atouts { gap: 16px; justify-content: space-between; }
+    .atouts b { font-size: 17px; }
+    .atouts span { font-size: 13px; }
+    .carte-envoi { padding: 22px 18px; border-radius: 24px; }
+    .champs { grid-template-columns: 1fr; }
+    .section { padding: 88px 0; }
+    .tete { margin-bottom: 40px; }
+    .criteres, .engagements { grid-template-columns: 1fr; }
+    .criteres li:nth-child(2) { border-top: 0; }
+    .carte { padding: 28px 24px; }
+    .final { padding: 112px 0; }
+    .pied .grille { grid-template-columns: 1fr 1fr; }
+    .pied .grille > :first-child { grid-column: 1 / -1; }
+  }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="logo-visu" viewBox="0 0 278.12 49.78"><path fill="currentColor" d="M131.19 49.48C131.50 49.34 131.75 49.12 131.75 49.01C131.75 48.89 132.17 48.57 132.69 48.29C137.92 45.45 138.20 44.96 134.84 44.53C133.90 44.41 109.73 44.30 81.05 44.30C45.64 44.29 28.81 44.21 28.48 44.03C27.90 43.72 27.80 42.01 28.34 41.57C28.59 41.36 43.98 41.29 86.43 41.28C150.72 41.28 145.84 41.42 148.52 39.55C149.28 39.01 150.24 38.49 150.64 38.39C151.04 38.29 152.10 37.87 152.99 37.47C153.89 37.06 155.19 36.53 155.87 36.28C158.34 35.40 159.22 35.05 161.08 34.18C162.12 33.69 163.20 33.29 163.47 33.29C164.25 33.29 165.45 32.15 165.08 31.77C164.84 31.53 164.44 31.54 163.20 31.82C158.96 32.76 144.96 31.96 140.73 30.53C138.23 29.69 135.43 27.25 134.13 24.79C133.76 24.08 133.47 1.16 133.83 0.60C134.11 0.17 143.02 0.16 143.45 0.59C143.67 0.81 143.75 3.64 143.75 11.76L143.75 22.63L144.91 23.74C147.80 26.51 152.42 27.30 161.08 26.51C164.72 26.19 165.39 25.94 166.57 24.50C168.02 22.73 168.00 22.88 168.00 11.30C168.00 1.77 168.04 0.58 168.40 0.44C169.35 0.08 177.43 0.28 177.76 0.68C178.02 0.99 178.05 3.71 177.91 14.43C177.79 24.25 177.82 27.79 178.03 27.79C178.30 27.79 179.68 27.38 186.50 25.29C188.22 24.76 190.75 24.03 192.13 23.65C193.50 23.27 195.41 22.64 196.37 22.24C197.34 21.83 199.36 21.11 200.87 20.63C204.51 19.48 204.75 19.37 204.75 18.89C204.75 18.35 205.63 19.03 195.37 11.69C194.69 11.20 193.56 10.52 192.87 10.17C189.79 8.61 190.23 7.30 193.37 8.68C193.79 8.86 195.47 9.53 197.13 10.16C200.44 11.42 202.86 12.46 203.63 12.92C203.90 13.09 204.74 13.56 205.50 13.97C207.48 15.03 207.98 15.32 209.37 16.19C210.06 16.62 211.97 17.67 213.63 18.53C217.56 20.59 219.13 21.47 220.51 22.40C222.04 23.43 222.49 23.71 223.37 24.20C223.79 24.42 224.69 24.97 225.37 25.41C226.06 25.85 227.51 26.76 228.58 27.44C229.66 28.11 231.01 28.97 231.58 29.34C234.88 31.50 234.74 31.50 238.53 28.98C240.24 27.84 242.92 26.09 244.50 25.07C246.08 24.06 247.82 22.91 248.37 22.51C248.93 22.12 250.27 21.27 251.37 20.63C252.48 19.99 253.99 19.05 254.75 18.55C255.51 18.04 257.19 17.02 258.50 16.29C259.81 15.55 260.91 14.85 260.96 14.74C261.00 14.63 261.18 14.54 261.35 14.54C261.52 14.54 262.03 14.26 262.50 13.91C263.40 13.25 264.11 13.09 263.94 13.58C263.89 13.75 263.64 14.00 263.38 14.15C263.13 14.29 262.72 14.58 262.49 14.79C262.25 15.00 261.42 15.61 260.66 16.17C259.89 16.72 257.43 18.61 255.19 20.39C252.96 22.16 250.84 23.79 250.49 24.01C250.15 24.23 247.85 26.10 245.39 28.17C242.93 30.23 239.68 32.93 238.15 34.17C236.62 35.42 235.07 36.74 234.70 37.11C233.74 38.08 233.45 38.00 230.35 35.98C228.82 34.98 226.92 33.77 226.14 33.29C225.35 32.81 223.17 31.38 221.29 30.12C219.41 28.85 216.86 27.14 215.63 26.32C214.39 25.49 212.71 24.28 211.89 23.62C208.50 20.87 207.91 20.50 207.13 20.62C205.96 20.79 201.90 22.35 198.94 23.76C197.46 24.46 196.19 25.04 196.11 25.04C195.98 25.04 193.19 26.20 191.87 26.80C191.60 26.92 190.93 27.18 190.37 27.38C189.13 27.81 185.72 29.20 184.35 29.82C183.78 30.08 183.22 30.29 183.10 30.29C182.75 30.29 179.58 31.62 176.99 32.85C175.69 33.47 174.34 34.06 174.00 34.17C173.66 34.27 172.25 34.89 170.87 35.54C164.47 38.57 162.85 39.29 162.42 39.29C161.40 39.29 160.34 40.83 161.15 41.14C161.36 41.22 187.63 41.29 219.51 41.29L277.48 41.29L277.76 41.82C278.12 42.48 277.86 43.94 277.36 44.14C277.15 44.22 249.05 44.26 214.92 44.24C180.80 44.21 151.86 44.20 150.62 44.21C148.21 44.24 146.31 44.72 142.00 46.39C140.83 46.85 138.77 47.53 137.41 47.91C136.05 48.29 134.65 48.75 134.29 48.94C133.92 49.13 133.27 49.29 132.83 49.29C132.39 49.29 131.96 49.40 131.87 49.54C131.79 49.68 131.47 49.78 131.17 49.77L130.63 49.76L131.19 49.48Z M93.00 31.76C83.29 30.99 78.69 29.26 76.13 25.41C74.54 23.01 74.85 22.68 78.87 22.45C80.39 22.37 82.39 22.22 83.32 22.13L85.02 21.97L86.45 23.49C89.10 26.31 94.67 27.19 105.88 26.55C108.77 26.38 111.36 26.25 111.64 26.26C112.53 26.29 114.54 24.75 115.21 23.53L115.84 22.39L115.23 21.18C114.05 18.79 112.85 18.57 98.75 18.05C80.26 17.38 75.75 15.58 75.75 8.87C75.75 4.42 78.52 2.29 86.13 0.88C89.78 0.20 109.16 0.19 112.70 0.87C120.38 2.33 126.42 7.10 121.64 7.92C119.77 8.24 115.34 8.79 114.64 8.79C114.09 8.79 113.48 8.46 112.50 7.64C110.19 5.71 109.65 5.55 104.05 5.23C98.00 4.88 90.59 5.21 89.37 5.88C88.96 6.10 88.43 6.29 88.19 6.29C86.45 6.29 85.09 9.34 86.31 10.48C86.85 10.98 87.35 11.13 90.45 11.77C91.18 11.92 95.06 12.15 99.08 12.29C103.09 12.43 107.72 12.71 109.37 12.91C111.03 13.10 113.05 13.34 113.87 13.43C118.07 13.87 121.48 15.19 123.84 17.28C126.49 19.64 126.20 24.87 123.25 27.76C121.85 29.13 121.66 29.24 118.00 30.53C114.36 31.83 101.69 32.45 93.00 31.76Z M21.52 31.53C20.83 31.24 20.73 31.12 18.45 27.68C17.53 26.30 16.39 24.66 15.92 24.04C15.45 23.42 14.88 22.58 14.66 22.17C14.43 21.75 13.40 20.23 12.38 18.79C11.35 17.35 9.99 15.38 9.33 14.41C8.68 13.45 7.46 11.76 6.62 10.67C5.77 9.57 4.12 7.20 2.95 5.41C1.79 3.63 0.64 2.01 0.41 1.82C0.19 1.63 0.00 1.30 0.00 1.07C0.00 0.71 6.49 0.50 9.79 0.76C10.27 0.79 12.91 4.60 13.88 6.66C14.24 7.42 14.79 8.36 15.10 8.73C15.41 9.11 15.92 9.86 16.25 10.41C16.58 10.97 17.98 13.16 19.38 15.29C22.90 20.66 23.75 22.02 23.75 22.26C23.75 22.59 24.63 23.29 25.04 23.29C25.25 23.29 25.61 22.87 25.84 22.35C26.06 21.84 26.58 20.80 26.98 20.04C27.38 19.28 28.06 17.93 28.48 17.04C28.91 16.15 29.36 15.25 29.49 15.04C29.61 14.83 30.47 13.09 31.39 11.17C36.73 0.00 35.97 0.76 41.96 0.60C47.20 0.46 47.16 0.44 45.84 2.71C45.29 3.65 44.53 5.03 44.13 5.79C43.73 6.55 42.93 7.95 42.34 8.91C41.76 9.88 40.89 11.47 40.41 12.46C39.94 13.45 39.17 14.86 38.71 15.59C37.58 17.37 37.39 17.73 34.77 22.89C33.51 25.35 32.11 27.99 31.65 28.76C31.19 29.53 30.73 30.41 30.64 30.70C30.55 31.00 30.29 31.32 30.06 31.41C29.28 31.70 22.16 31.81 21.52 31.53Z M57.18 31.23C56.47 30.69 56.41 0.57 57.13 0.40C57.40 0.33 59.65 0.30 62.13 0.34L66.63 0.41L66.63 15.56C66.63 28.04 66.56 30.79 66.28 31.13C65.84 31.66 57.87 31.75 57.18 31.23Z"/></symbol></svg>
+<script>document.documentElement.classList.add("js");</script>
+<a class="skip" href="#contenu">Aller au contenu</a>
+
+<header class="entete">
+  <div class="wrap">
+    <a class="logo" href="#" aria-label="visu — accueil"><svg viewBox="0 0 278.12 49.78" aria-hidden="true"><use href="#logo-visu"/></svg></a>
+    <nav class="nav" aria-label="Navigation principale">
+      <a href="#fonctionnement">Fonctionnement</a>
+      <a href="#criteres">Critères</a>
+      <a href="#faq">Questions</a>
+      <a class="btn btn-primaire btn-petit" href="#envoyer">Envoyer</a>
+    </nav>
+  </div>
+</header>
+
+<main id="contenu">
+  <section class="hero" id="envoyer">
+    <div class="wrap">
+      <div class="accroche apparait">
+        <p class="eyebrow">Highlights · Ouvert à tous les joueurs francophones</p>
+        <h1>Ton meilleur move.<br><span class="sub">Sur @be.visu</span></h1>
+        <p class="lead">Envoie ton highlight. On choisit les meilleurs. On les publie, avec ton nom.</p>
+        <ul class="atouts">
+          <li><b>Gratuit</b><span>sans compte</span></li>
+          <li><b>2 minutes</b><span>vidéo comprise</span></li>
+          <li><b>Ton nom</b><span>en crédit</span></li>
+        </ul>
+      </div>
+
+      <form class="carte-envoi apparait" id="formulaire" novalidate>
+        <div id="saisie">
+          <fieldset>
+            <legend><span class="num">1</span>Ta vidéo</legend>
+            <label class="depot" id="depot">
+              <input type="file" name="video" accept="video/*">
+              <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><path d="M14 19V6m0 0-5 5m5-5 5 5M5 22h18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <b>Choisir ma vidéo</b>
+              <span>60 secondes max. · 300 Mo max.</span>
+            </label>
+            <div class="fichier" id="fichier" hidden>
+              <canvas id="vignette" width="144" height="144" aria-hidden="true"></canvas>
+              <div class="fichier-txt">
+                <b id="fichier-nom"></b>
+                <span id="fichier-info"></span>
+                <div class="barre-env" aria-hidden="true"><i id="barre"></i></div>
+                <span class="etat" id="fichier-etat" role="status"></span>
+              </div>
+              <button type="button" class="lien" id="changer">Changer</button>
+            </div>
+            <label class="case"><input type="checkbox" name="droits"><span>J'accepte les <a href="#conditions" class="js-ouvre">conditions d'envoi</a> (licence gratuite, non exclusive, 5 ans) et j'ai lu la <a href="#vie-privee" class="js-ouvre">mention vie privée</a>.</span></label>
+            <label class="case"><input type="checkbox" name="personnes"><span>J'apparais dans la vidéo. La personne qui a filmé et les autres personnes reconnaissables sont d'accord.</span></label>
+          </fieldset>
+
+          <fieldset>
+            <legend><span class="num">2</span>Toi</legend>
+            <div class="champs">
+              <label class="champ"><span>Prénom et nom</span><input name="nom" autocomplete="name" maxlength="200"></label>
+              <label class="champ"><span>E-mail</span><input name="email" type="email" inputmode="email" autocomplete="email" autocapitalize="none" maxlength="120"></label>
+              <label class="champ"><span>Ville</span><input name="ville" autocomplete="address-level2" maxlength="80"></label>
+              <label class="champ"><span>Pays</span>
+                <select name="pays" autocomplete="country-name">
+                  <option selected>Belgique</option><option>France</option><option>Suisse</option><option>Luxembourg</option>
+                  <option>Canada</option><option>Maroc</option><option>Algérie</option><option>Tunisie</option>
+                  <option>Sénégal</option><option>Côte d'Ivoire</option><option>Autre</option>
+                </select>
+              </label>
+              <label class="champ"><span>Pseudo pour le crédit <em>facultatif</em></span><input name="pseudo" maxlength="60" placeholder="Sinon, ton prénom"></label>
+              <label class="champ"><span>Instagram ou TikTok <em>facultatif</em></span><input name="reseau" maxlength="80" placeholder="@" autocapitalize="none" autocorrect="off"></label>
+            </div>
+            <div class="choix" role="radiogroup" aria-label="Ton âge">
+              <span class="choix-titre">Ton âge</span>
+              <label><input type="radio" name="age" value="18 ans ou plus"> 18 ans ou plus</label>
+              <label><input type="radio" name="age" value="Moins de 18 ans"> Moins de 18 ans</label>
+            </div>
+            <div class="parent" id="bloc-parent" hidden>
+              <p class="aide">Un parent ou tuteur doit donner son accord. Il reçoit un e-mail pour confirmer : sans sa confirmation, rien n'est publié.</p>
+              <div class="champs">
+                <label class="champ"><span>Son prénom et nom</span><input name="parentNom" maxlength="200"></label>
+                <label class="champ"><span>Son e-mail</span><input name="parentEmail" type="email" inputmode="email" autocapitalize="none" maxlength="120"></label>
+              </div>
+              <label class="case"><input type="checkbox" name="parentOk"><span>Je suis le parent ou le tuteur légal du joueur. J'autorise l'envoi de cette vidéo et son utilisation par visu selon les conditions d'envoi.</span></label>
+            </div>
+            <label class="champ seul"><span>Un mot sur le clip <em>facultatif</em></span><input name="commentaire" maxlength="300" placeholder="Où, quand, contre qui…"></label>
+            <label class="case"><input type="checkbox" name="infos"><span>Préviens-moi des prochains tournois par e-mail.</span></label>
+          </fieldset>
+
+          <div class="piege" aria-hidden="true"><label>Site <input name="site" tabindex="-1" autocomplete="off"></label></div>
+
+          <div class="envoi">
+            <p class="erreur" id="erreur" role="alert" hidden></p>
+            <button class="btn btn-primaire" type="submit" id="bouton"><span id="bouton-txt">Envoyer mon highlight</span>
+              <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M1 7h11M8 3l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <p class="note">Tes infos servent uniquement à la sélection et au crédit du clip.</p>
+          </div>
+        </div>
+
+        <div class="merci" id="merci" hidden tabindex="-1">
+          <svg width="56" height="56" viewBox="0 0 56 56" aria-hidden="true"><circle cx="28" cy="28" r="27" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M18 29l7 7 13-15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <h2>C'est envoyé.</h2>
+          <p class="merci-cle">Ton highlight est bien arrivé chez visu. Tu n'as plus rien à faire.</p>
+          <p>Un e-mail de confirmation part vers ta boîte. Si ton clip est retenu, il passe sur @be.visu avec ton nom. <span id="merci-parent" hidden>Avant ça, ton parent ou tuteur doit confirmer son accord avec le lien reçu par e-mail.</span></p>
+          <p class="ref">Référence <b id="merci-ref"></b></p>
+          <button class="btn btn-contour" type="button" id="encore">Envoyer un autre clip</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <section class="section" id="fonctionnement">
+    <div class="wrap fonction">
+      <div>
+        <div class="apparait"><p class="eyebrow">Fonctionnement</p><h2 style="margin-top:16px">Trois étapes.</h2></div>
+        <ol class="pas">
+          <li class="apparait"><span class="n">01</span><div><h3>Ta vidéo</h3><p>Choisis ton clip. Il part aussitôt, en qualité d'origine.</p></div></li>
+          <li class="apparait"><span class="n">02</span><div><h3>Tes infos</h3><p>Pendant que la vidéo s'envoie, dis-nous qui créditer.</p></div></li>
+          <li class="apparait"><span class="n">03</span><div><h3>La sélection</h3><p>Si ton clip est retenu, il passe sur @be.visu et on te prévient par e-mail.</p></div></li>
+        </ol>
+      </div>
+      <figure class="post apparait" aria-label="Exemple de publication sur @be.visu">
+        <div class="ecran">
+          <svg class="terrain" viewBox="0 0 90 160" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+            <g fill="none" stroke="#FFFFFF" stroke-opacity=".14" stroke-width=".4">
+              <rect x="27" y="108" width="36" height="52"/>
+              <circle cx="45" cy="108" r="12"/>
+              <path d="M5 160V138A40 40 0 0 1 85 138V160"/>
+              <circle cx="45" cy="152" r="1.6"/>
+              <line x1="37" y1="157" x2="53" y2="157"/>
+            </g>
+          </svg>
+          <div class="haut"><span>@be.visu</span><svg viewBox="0 0 278.12 49.78" aria-hidden="true"><use href="#logo-visu"/></svg></div>
+          <div class="bas">
+            <p class="credit">Ton pseudo.<span>Ta ville</span></p>
+            <div class="barre"><i></i></div>
+          </div>
+        </div>
+        <figcaption>Ton clip, ton crédit.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="section" id="criteres">
+    <div class="wrap">
+      <div class="tete apparait">
+        <div><p class="eyebrow">Critères</p><h2>Ce qu'on cherche.</h2></div>
+        <p>Un move qui fait réagir, filmé proprement. Le 1v1 a notre préférence.</p>
+      </div>
+      <ul class="criteres apparait">
+        <li><b>Durée</b><span>60 secondes max.</span></li>
+        <li><b>Format</b><span>Vertical de préférence</span></li>
+        <li><b>Qualité</b><span>Fichier d'origine, sans filtre</span></li>
+        <li><b>Son</b><span>Sans musique, on met la nôtre</span></li>
+        <li><b>Toi</b><span>Tu apparais dans la vidéo</span></li>
+        <li><b>Âge</b><span>Moins de 18 ans : accord d'un parent</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="tete apparait">
+        <div><p class="eyebrow">Nos engagements</p><h2>Ton clip, tes droits.</h2></div>
+        <p>Tu nous autorises à publier. Tu ne nous cèdes rien d'autre.</p>
+      </div>
+      <div class="engagements">
+        <div class="carte apparait">
+          <h3>Ce qu'on fait</h3>
+          <ul>
+            <li>Publier sur Instagram, TikTok et YouTube, avec ton crédit</li>
+            <li>Monter le clip : recadrage, ralenti, son, logo</li>
+            <li>Retirer la publication sous 7 jours, sur simple demande</li>
+            <li>Supprimer les clips non retenus sous 3 mois</li>
+          </ul>
+        </div>
+        <div class="carte non apparait">
+          <h3>Ce qu'on ne fait pas</h3>
+          <ul>
+            <li>Utiliser ton clip dans une publicité payante sans te demander</li>
+            <li>L'imprimer sur des vêtements ou des affiches sans accord</li>
+            <li>Le revendre à qui que ce soit</li>
+            <li>Publier un mineur sans la confirmation d'un parent</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="faq">
+    <div class="wrap deux">
+      <div class="apparait"><p class="eyebrow">Questions</p><h2 style="margin-top:16px">Tout ce qu'il faut savoir.</h2></div>
+      <div class="acc apparait">
+        <details>
+          <summary>Combien de temps ça prend ?</summary>
+          <p class="rep">Deux minutes. Ta vidéo part directement vers notre stockage dès que tu l'as choisie, pendant que tu remplis le reste. La durée de l'envoi dépend ensuite de ta connexion.</p>
+        </details>
+        <details>
+          <summary>C'est payant ?</summary>
+          <p class="rep">Non. L'envoi est gratuit et sans compte. En retour, la publication n'est pas rémunérée.</p>
+        </details>
+        <details>
+          <summary>Ma vidéo reste à moi ?</summary>
+          <p class="rep">Oui. Tu nous donnes une autorisation non exclusive : tu peux continuer à la publier où tu veux.</p>
+        </details>
+        <details>
+          <summary>Mon clip sera publié à coup sûr ?</summary>
+          <p class="rep">Non. On sélectionne peu de clips, pour garder un niveau élevé. Si le tien est retenu, tu reçois un e-mail.</p>
+        </details>
+        <details>
+          <summary>J'ai moins de 18 ans.</summary>
+          <p class="rep">Tu peux envoyer. Un de tes parents remplit sa partie du formulaire, puis confirme par e-mail. Sans cette confirmation, rien n'est publié.</p>
+        </details>
+        <details>
+          <summary>Pourquoi sans musique ?</summary>
+          <p class="rep">Une musique protégée peut faire bloquer la vidéo. On ajoute un son libre de droits au montage.</p>
+        </details>
+        <details>
+          <summary>Je veux faire retirer une publication.</summary>
+          <p class="rep">Écris à <a class="courriel" data-courriel="lien-adresse" href="#contact" target="_blank" rel="noopener">notre adresse e-mail</a>. C'est retiré sous 7 jours.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="regles">
+    <div class="wrap deux">
+      <div class="apparait"><p class="eyebrow">Cadre</p><h2 style="margin-top:16px">Les règles.</h2></div>
+      <div class="acc apparait">
+        <details id="conditions">
+          <summary>Conditions d'envoi</summary>
+          <div class="legal">
+          <h4>1. Qui peut envoyer</h4>
+          <p>Toute personne qui joue au basketball et envoie une vidéo où elle apparaît. Si tu as moins de 18 ans, un de tes parents (ou ton tuteur légal) doit donner son accord dans le formulaire.</p>
+          <h4>2. Ce que tu garantis</h4>
+          <ul>
+            <li>Tu apparais dans la vidéo.</li>
+            <li>Tu l'as filmée toi-même, ou la personne qui l'a filmée est d'accord pour que tu l'envoies.</li>
+            <li>Les autres personnes reconnaissables sont d'accord pour y apparaître.</li>
+            <li>La vidéo ne contient rien d'illégal, de violent, d'insultant ou de discriminatoire.</li>
+          </ul>
+          <h4>3. Ce que tu autorises</h4>
+          <p>Une autorisation gratuite et non exclusive à visu (Quentin [NOM], fondateur) pour publier la vidéo sur Instagram, TikTok et YouTube (@be.visu), la montrer sur écran lors des événements visu, la couper, la recadrer, changer sa vitesse, la mettre en musique, y ajouter le logo, du texte et ton pseudo, et l'intégrer à une compilation. Dans le monde entier, pendant 5 ans à partir de l'envoi. Les publications faites pendant cette période peuvent rester en ligne ensuite.</p>
+          <h4>4. Ce que tu n'autorises pas</h4>
+          <p>Sauf nouvel accord écrit : publicité payante, vêtements ou produits visu, affiche imprimée, revente à un tiers.</p>
+          <h4>5. Ta vidéo reste à toi</h4>
+          <p>Tu peux la publier où tu veux.</p>
+          <h4>6. Sélection</h4>
+          <p>visu choisit librement les vidéos publiées. L'envoi ne donne droit à aucune rémunération.</p>
+          <h4>7. Crédit</h4>
+          <p>Ton pseudo ou ton @ est cité, sauf si tu demandes le contraire.</p>
+          <h4>8. Retrait</h4>
+          <p>Sur simple demande à <span class="courriel" data-courriel="texte">notre adresse e-mail</span>, retrait sous 7 jours. Des copies faites par des tiers peuvent rester en ligne.</p>
+          <h4>9. Droit applicable</h4>
+          <p>Droit belge, sans préjudice des règles impératives qui protègent le joueur dans son pays de résidence.</p>
+          <p>Version du 4 novembre 2026.</p>
+        </div>
+        </details>
+        <details id="vie-privee">
+          <summary>Vie privée</summary>
+          <div class="legal">
+          <h4>Responsable</h4>
+          <p>Quentin [NOM], fondateur de visu (entreprise en cours de création). Contact : <span class="courriel" data-courriel="texte">notre adresse e-mail</span>.</p>
+          <h4>Données</h4>
+          <p>Nom, pseudo et @, e-mail, tranche d'âge, pays et ville, la vidéo (ton image, ta voix). Moins de 18 ans : nom et e-mail du parent ou tuteur.</p>
+          <h4>Usages</h4>
+          <ul>
+            <li>Trier et publier les vidéos retenues, avec ton crédit (consentement).</li>
+            <li>Garder la preuve de ton accord (intérêt légitime).</li>
+            <li>T'informer des prochains tournois, si tu l'as accepté (consentement).</li>
+          </ul>
+          <h4>Outils</h4>
+          <p>Google (Drive pour les vidéos, Sheets pour le formulaire, Gmail pour les e-mails), qui peut stocker des données hors de l'Union européenne avec les garanties prévues par le RGPD. Les vidéos publiées sont visibles par tous.</p>
+          <h4>Durée</h4>
+          <p>Vidéos non retenues : supprimées sous 3 mois. Vidéos publiées et preuve d'accord : pendant la licence de 5 ans, et tant qu'une publication reste en ligne pour la preuve. E-mail tournois : jusqu'à désinscription.</p>
+          <h4>Tes droits</h4>
+          <p>Accès, correction, suppression, retrait du consentement, opposition : écris à <span class="courriel" data-courriel="texte">notre adresse e-mail</span>, réponse sous un mois. Réclamation possible auprès de l'autorité de ton pays : APD (Belgique), CNIL (France), PFPDT (Suisse), CAI (Québec).</p>
+          <p>Version du 4 novembre 2026.</p>
+        </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section class="final">
+    <div class="wrap apparait">
+      <svg viewBox="0 0 278.12 49.78" class="logo-grand" role="img" aria-label="visu"><use href="#logo-visu"/></svg>
+      <h2>À toi.</h2>
+      <p>Deux minutes, un clip, ton nom sur @be.visu</p>
+      <a class="btn btn-primaire" href="#envoyer">Envoyer mon highlight
+        <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M1 7h11M8 3l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+  </section>
+</main>
+
+<footer class="pied">
+  <div class="wrap">
+    <div class="grille">
+      <div>
+        <a class="logo" href="#" aria-label="visu — accueil"><svg viewBox="0 0 278.12 49.78" aria-hidden="true"><use href="#logo-visu"/></svg></a>
+        <p style="margin-top:16px;max-width:32ch">Tournois de basketball 1v1. Belgique.</p>
+      </div>
+      <div>
+        <h4>Suivre</h4>
+        <ul>
+          <li><a href="https://www.instagram.com/be.visu/" target="_blank" rel="noopener">Instagram</a></li>
+          <li><a href="https://www.tiktok.com/@be.visu" target="_blank" rel="noopener">TikTok</a></li>
+          <li><a href="https://www.youtube.com/@be.visu" target="_blank" rel="noopener">YouTube</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Infos</h4>
+        <ul>
+          <li><a href="#conditions" class="js-ouvre">Conditions d'envoi</a></li>
+          <li><a href="#vie-privee" class="js-ouvre">Vie privée</a></li>
+          <li><a class="courriel" data-courriel="lien" href="#contact" target="_blank" rel="noopener">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="bas">
+      <span>© 2026 visu</span>
+      <span>@be.visu</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+
+  // Les liens du pied de page ouvrent le bon accordéon.
+  document.querySelectorAll(".js-ouvre").forEach(function (a) {
+    a.addEventListener("click", function () {
+      var cible = document.querySelector(a.getAttribute("href"));
+      if (cible) cible.open = true;
+    });
+  });
+
+  // Filet sous l'en-tête dès qu'on défile.
+  var entete = document.querySelector(".entete");
+  function majEntete() { entete.classList.toggle("defile", window.scrollY > 8); }
+  window.addEventListener("scroll", majEntete, { passive: true });
+  majEntete();
+
+  // Adresse de contact : assemblée par le navigateur, absente du code source (contre les robots qui collectent les e-mails).
+  (function () {
+    var a = ["moc.liamg", "tnemanruotusiv"].map(function (s) { return s.split("").reverse().join(""); });
+    var adresse = a[1] + String.fromCharCode(64) + a[0];
+    document.querySelectorAll("[data-courriel]").forEach(function (n) {
+      var mode = n.getAttribute("data-courriel");
+      if (mode !== "lien") n.textContent = adresse;
+      if (mode !== "texte") n.href = "mailto:" + adresse;
+    });
+  })();
+
+  // ---------- Envoi ----------  // Adresse /exec de l'application Apps Script. Vide quand la page est servie par Apps Script lui-même ;
+  // à remplir quand la page est hébergée ailleurs (site statique, domaine à toi).
+  var API = "https://script.google.com/macros/s/AKfycbxg6v_nsWQpPDx1Rn8fchpl9WbWksmnfPBvjxW4IUNY8dBM6UbpszSbRnxhfvaCN4HWzg/exec";
+  var TAILLE_MAX_MO = 300;
+  var DUREE_MAX_S = 65; // 60 s annoncées, petite marge
+  var ABANDON = {};     // marque un envoi annulé par le joueur (changement de vidéo)
+
+  function byId(id) { return document.getElementById(id); }
+  var form = byId("formulaire"), el = form.elements, champVideo = el.video;
+  var saisie = byId("saisie"), merci = byId("merci"), blocParent = byId("bloc-parent");
+  var depotEl = byId("depot"), fichierEl = byId("fichier"), infoEl = byId("fichier-info"), etatEl = byId("fichier-etat");
+  var barre = byId("barre"), vignette = byId("vignette"), changerBtn = byId("changer");
+  var bouton = byId("bouton"), boutonTxt = byId("bouton-txt"), erreurEl = byId("erreur");
+
+  var envoi = null;   // la vidéo choisie : { n, f, etat: controle | refuse | pret | envoi | fini | erreur, id, idFichier, xhr }
+  var numero = 0;     // change à chaque nouvelle vidéo : les réponses d'un envoi abandonné sont ignorées
+  var soumis = false; // le joueur a validé le formulaire ; on attend la fin de l'envoi de la vidéo
+
+  // Le serveur : google.script.run quand la page est servie par Apps Script, sinon l'API en POST.
+  function appeler(nom) {
+    var args = Array.prototype.slice.call(arguments, 1);
+    var run = window.google && google.script && google.script.run;
+    if (run) {
+      return new Promise(function (ok, ko) { run.withSuccessHandler(ok).withFailureHandler(ko)[nom].apply(null, args); });
+    }
+    if (!API) return Promise.reject(new Error("Aperçu hors ligne : l'envoi fonctionne une fois la page en ligne."));
+    return fetch(API, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ fn: nom, args: args }), redirect: "follow" })
+      .then(function (r) { return r.json(); })
+      .then(function (j) { if (j && j.ok) return j.r; throw new Error((j && j.erreur) || "Le serveur n'a pas répondu. Réessaie."); });
+  }
+
+  function mo(o) { return (o / 1048576).toFixed(o < 10485760 ? 1 : 0).replace(".", ",") + " Mo"; }
+  function duree(s) { return s < 60 ? Math.max(5, Math.ceil(s / 5) * 5) + " s" : Math.ceil(s / 60) + " min"; }
+  function attendre(ms) { return new Promise(function (ok) { setTimeout(ok, ms); }); }
+  function etatTxt(t) { etatEl.textContent = t; }
+  function afficherErreur(msg) { erreurEl.textContent = msg; erreurEl.hidden = !msg; }
+
+  // Champs en erreur : le message s'affiche sous le champ concerné.
+  function demarquer(bloc) {
+    if (!bloc) return;
+    bloc.classList.remove("invalide");
+    var m = bloc.classList.contains("depot") ? bloc.nextElementSibling : bloc.querySelector(".msg");
+    if (m && m.classList.contains("msg")) m.remove();
+  }
+  function marquer(champ, msg) {
+    var bloc = champ.closest(".champ, .choix, .case, .depot");
+    demarquer(bloc);
+    bloc.classList.add("invalide");
+    var m = document.createElement("small");
+    m.className = "msg"; m.textContent = msg;
+    if (bloc.classList.contains("depot")) bloc.insertAdjacentElement("afterend", m); else bloc.appendChild(m);
+  }
+  form.addEventListener("input", function (e) { demarquer(e.target.closest(".champ, .choix, .case, .depot")); });
+  form.addEventListener("change", function (e) {
+    demarquer(e.target.closest(".champ, .choix, .case, .depot"));
+    if (e.target.name === "age") blocParent.hidden = el.age.value !== "Moins de 18 ans";
+    if (e.target.name === "droits" || e.target.name === "personnes") demarrerSiPret();
+  });
+
+  // Vignette de la vidéo : une image du clip, ou à défaut un symbole lecture.
+  function dessinerVignette(video) {
+    var g = vignette.getContext("2d"), c = vignette.width;
+    g.fillStyle = "#1A1E28"; g.fillRect(0, 0, c, c);
+    if (video && video.videoWidth) {
+      try {
+        var s = Math.min(video.videoWidth, video.videoHeight);
+        g.drawImage(video, (video.videoWidth - s) / 2, (video.videoHeight - s) / 2, s, s, 0, 0, c, c);
+        return;
+      } catch (e) { /* format non lisible ici : on garde le symbole */ }
+    }
+    g.fillStyle = "rgba(255,255,255,.7)"; g.beginPath(); g.moveTo(58, 48); g.lineTo(98, 72); g.lineTo(58, 96); g.closePath(); g.fill();
+  }
+  // Lit la durée (pour refuser tout de suite un clip trop long), puis une image pour la vignette.
+  function lireVideo(f, suite) {
+    var v = document.createElement("video"), fait = false, url = URL.createObjectURL(f);
+    function fin(d) { if (!fait) { fait = true; suite(d); } }
+    function nettoyer() { try { URL.revokeObjectURL(url); } catch (e) {} }
+    v.preload = "metadata"; v.muted = true; v.playsInline = true;
+    v.onloadedmetadata = function () {
+      var d = isFinite(v.duration) ? v.duration : null;
+      fin(d);
+      try { v.currentTime = Math.min(1, (d || 2) / 3); } catch (e) { nettoyer(); }
+    };
+    v.onseeked = function () { if (envoi && envoi.f === f) dessinerVignette(v); nettoyer(); };
+    v.onerror = function () { fin(null); nettoyer(); };
+    setTimeout(function () { fin(null); }, 2500);
+    v.src = url;
+  }
+
+  function accordsOk() { return el.droits.checked && el.personnes.checked; }
+
+  function abandonner() {
+    numero++;
+    if (envoi && envoi.xhr) { try { envoi.xhr.abort(); } catch (e) {} }
+    envoi = null;
+    libererEcran();
+    champVideo.value = "";
+    fichierEl.hidden = true; fichierEl.classList.remove("refuse");
+    depotEl.hidden = false;
+    changerBtn.textContent = "Changer";
+    barre.style.width = "0";
+  }
+  function refuser(e, msg) {
+    e.etat = "refuse";
+    fichierEl.classList.add("refuse");
+    etatTxt(msg);
+    if (soumis) { soumis = false; figer(false); }
+  }
+
+  function choisir(f) {
+    abandonner();
+    if (!f) return;
+    var e = envoi = { n: ++numero, f: f, etat: "controle" };
+    demarquer(depotEl);
+    depotEl.hidden = true; fichierEl.hidden = false;
+    byId("fichier-nom").textContent = f.name;
+    infoEl.textContent = mo(f.size);
+    dessinerVignette(null);
+    if (!/^video\//.test(f.type)) return refuser(e, "Ce fichier n'est pas une vidéo.");
+    if (f.size > TAILLE_MAX_MO * 1048576) return refuser(e, "Vidéo trop lourde : " + TAILLE_MAX_MO + " Mo maximum. Coupe-la ou exporte-la en 1080p.");
+    etatTxt("Lecture de la vidéo…");
+    lireVideo(f, function (d) {
+      if (e.n !== numero) return;
+      if (d) infoEl.textContent = Math.round(d) + " s · " + mo(f.size);
+      if (d && d > DUREE_MAX_S) return refuser(e, "Vidéo trop longue : 60 secondes maximum. Coupe-la sur l'action.");
+      e.etat = "pret";
+      demarrerSiPret();
+    });
+  }
+  champVideo.addEventListener("change", function () { choisir(champVideo.files[0]); });
+  ["dragenter", "dragover"].forEach(function (t) { depotEl.addEventListener(t, function () { depotEl.classList.add("survol"); }); });
+  ["dragleave", "drop"].forEach(function (t) { depotEl.addEventListener(t, function () { depotEl.classList.remove("survol"); }); });
+  changerBtn.addEventListener("click", function () {
+    if (envoi && envoi.etat === "erreur") {   // « Réessayer » : même vidéo, nouvel envoi
+      envoi.etat = "pret"; changerBtn.textContent = "Changer"; barre.style.width = "0";
+      return demarrerSiPret();
+    }
+    abandonner();
+    champVideo.click();
+  });
+
+  // La vidéo part dès qu'elle est choisie et que les deux accords sont cochés, pendant que le joueur remplit le reste.
+  function demarrerSiPret() {
+    var e = envoi;
+    if (!e || e.etat !== "pret") return;
+    if (!accordsOk()) return etatTxt("Coche les deux cases ci-dessous : l'envoi démarre aussitôt.");
+    lancer(e);
+  }
+
+  function progres(e, octets) {
+    if (e.n !== numero) return;
+    var t = Date.now();
+    if (!e.t0) { e.t0 = t; e.o0 = octets; }
+    var pct = Math.min(99, Math.floor(octets / e.f.size * 100));
+    barre.style.width = pct + "%";
+    var txt = "Envoi… " + pct + " %", dt = (t - e.t0) / 1000;
+    if (dt > 2 && octets > e.o0) txt += " · encore " + duree((e.f.size - octets) / ((octets - e.o0) / dt));
+    etatTxt(txt);
+    if (soumis) boutonTxt.textContent = "Envoi de la vidéo… " + pct + " %";
+  }
+
+  // Envoi direct d'un morceau du téléphone vers Google Drive : données brutes, sans détour par le serveur.
+  // L'adresse de session ne permet que de déposer cette vidéo-là ; aucun accès Google n'est donné à la page.
+  function envoyerDirect(e, session, debut, taille) {
+    var f = e.f, fin = Math.min(debut + taille, f.size);
+    return new Promise(function (ok, ko) {
+      var x = e.xhr = new XMLHttpRequest();
+      x.open("PUT", session, true);
+      x.setRequestHeader("Content-Range", "bytes " + debut + "-" + (fin - 1) + "/" + f.size);
+      x.upload.onprogress = function (ev) { if (ev.lengthComputable) progres(e, debut + Math.min(ev.loaded, fin - debut)); };
+      x.onload = function () {
+        if (x.status === 308) {
+          var m = String(x.getResponseHeader("Range") || "").match(/bytes=0-(\d+)/);
+          var recu = m ? Number(m[1]) + 1 : fin;
+          // Drive n'a pas tout : on demandera au serveur où reprendre exactement.
+          if (recu <= debut || recu >= f.size) return ko(new Error("Envoi incomplet, reprise…"));
+          return ok({ termine: false, recu: recu });
+        }
+        if (x.status === 200 || x.status === 201) {
+          var j = null;
+          try { j = JSON.parse(x.responseText); } catch (err) { j = null; }
+          return ok({ termine: true, idFichier: j && j.id ? String(j.id) : "" });
+        }
+        ko(new Error("L'envoi a été interrompu (" + x.status + ")."));
+      };
+      x.onerror = function () { ko(new Error("L'envoi a échoué. Vérifie ta connexion.")); };
+      x.onabort = function () { ko(ABANDON); };
+      x.send(f.slice(debut, fin));
+    });
+  }
+  function lireMorceau(blob) {
+    return new Promise(function (ok, ko) {
+      var r = new FileReader();
+      r.onload = function () { ok(String(r.result).split(",")[1] || ""); };
+      r.onerror = function () { ko(new Error("Impossible de lire la vidéo sur cet appareil.")); };
+      r.readAsDataURL(blob);
+    });
+  }
+
+  // Garde l'écran allumé pendant l'envoi : sur téléphone, la mise en veille coupe souvent la connexion.
+  var verrouEcran = null;
+  function demanderEcranAllume() {
+    try {
+      if (navigator.wakeLock && navigator.wakeLock.request) {
+        navigator.wakeLock.request("screen").then(function (v) { verrouEcran = v; }, function () {});
+      }
+    } catch (e) { verrouEcran = null; }
+  }
+  function libererEcran() {
+    try { if (verrouEcran) verrouEcran.release(); } catch (e) {}
+    verrouEcran = null;
+  }
+  window.addEventListener("beforeunload", function (ev) {
+    if ((envoi && envoi.etat === "envoi") || soumis) { ev.preventDefault(); ev.returnValue = ""; }
+  });
+
+  function lancer(e) {
+    var f = e.f;
+    function vivant() { return e.n === numero; }
+    e.etat = "envoi"; e.t0 = 0;
+    etatTxt("Préparation de l'envoi…");
+    demanderEcranAllume();
+
+    appeler("ouvrirEnvoi", { nom: f.name, type: f.type, taille: f.size, accords: true }, location.origin).then(function (r) {
+      if (!vivant()) throw ABANDON;
+      e.id = r.id;
+      var debut = 0, echecs = 0;
+      var mode = r.session ? "direct" : "relais";
+      var directValide = false; // passe à vrai dès qu'un morceau est arrivé en direct
+
+      function etape() {
+        if (!vivant()) return Promise.reject(ABANDON);
+        if (debut >= f.size) return Promise.reject(new Error("Envoi incomplet, reprise…"));
+        if (mode === "direct") {
+          return envoyerDirect(e, r.session, debut, r.tailleMorceauDirect).then(function (res) {
+            directValide = true;
+            echecs = 0;
+            if (res.termine) { e.idFichier = res.idFichier; return; }
+            debut = res.recu;
+            progres(e, debut);
+            return etape();
+          });
+        }
+        var morceau = f.slice(debut, Math.min(debut + r.tailleMorceau, f.size));
+        return lireMorceau(morceau).then(function (b64) {
+          return appeler("envoyerMorceau", r.id, debut, b64);
+        }).then(function (res) {
+          echecs = 0;
+          debut = res.recu;
+          progres(e, debut);
+          if (!res.termine) return etape();
+        });
+      }
+
+      // En cas de coupure : on demande au serveur où en est Drive et on reprend là, sans tout renvoyer.
+      function avecReprise() {
+        return etape().catch(function (err) {
+          if (err === ABANDON || !vivant()) throw ABANDON;
+          echecs++;
+          // Envoi direct refusé deux fois avant le moindre morceau : ce navigateur le bloque, on passe par le serveur.
+          if (mode === "direct" && !directValide && echecs >= 2) mode = "relais";
+          if (echecs > 5) throw err;
+          etatTxt("Connexion instable, reprise de l'envoi…");
+          return attendre(Math.min(echecs, 4) * 1500).then(function () {
+            return appeler("etatEnvoi", r.id);
+          }).then(function (etat) {
+            if (!vivant()) throw ABANDON;
+            if (etat.termine) return;
+            debut = etat.recu;
+            return avecReprise();
+          });
+        });
+      }
+      return avecReprise();
+    }).then(function () {
+      if (!vivant()) return;
+      e.etat = "fini";
+      libererEcran();
+      barre.style.width = "100%";
+      etatTxt(soumis ? "Vidéo reçue ✓" : "Vidéo reçue ✓ Termine le formulaire et touche « Envoyer mon highlight » pour valider.");
+      if (soumis) finaliser();
+    }).catch(function (err) {
+      if (err === ABANDON || !vivant()) return;
+      e.etat = "erreur";
+      libererEcran();
+      etatTxt((err && err.message) || "L'envoi a échoué. Vérifie ta connexion.");
+      changerBtn.textContent = "Réessayer";
+      if (soumis) { soumis = false; figer(false); afficherErreur("La vidéo n'est pas partie. Touche « Réessayer », puis renvoie le formulaire."); }
+    });
+  }
+
+  function valider() {
+    var premier = null, mail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    form.querySelectorAll(".invalide").forEach(demarquer);
+    function m(champ, msg) { marquer(champ, msg); if (!premier) premier = champ; }
+    if (!envoi) m(champVideo, "Choisis ta vidéo.");
+    else if (envoi.etat === "refuse" || envoi.etat === "erreur") premier = changerBtn;
+    if (!el.droits.checked) m(el.droits, "Coche cette case pour envoyer ta vidéo.");
+    if (!el.personnes.checked) m(el.personnes, "Coche cette case pour envoyer ta vidéo.");
+    if (!el.nom.value.trim()) m(el.nom, "Indique ton prénom et ton nom.");
+    if (!mail.test(el.email.value.trim())) m(el.email, "Vérifie ton adresse e-mail.");
+    if (!el.ville.value.trim()) m(el.ville, "Indique ta ville.");
+    if (!el.age.value) m(el.age[0], "Choisis ton âge.");
+    if (el.age.value === "Moins de 18 ans") {
+      var pm = el.parentEmail.value.trim().toLowerCase();
+      if (!el.parentNom.value.trim()) m(el.parentNom, "Indique le nom de ton parent ou tuteur.");
+      if (!mail.test(pm)) m(el.parentEmail, "Vérifie l'adresse e-mail du parent.");
+      else if (pm === el.email.value.trim().toLowerCase()) m(el.parentEmail, "L'e-mail du parent doit être différent du tien.");
+      if (!el.parentOk.checked) m(el.parentOk, "Le parent ou tuteur doit cocher cette case.");
+    }
+    if (premier) {
+      premier.focus({ preventScroll: true });
+      (premier.closest(".champ, .choix, .case, .depot, .fichier") || premier).scrollIntoView({ block: "center" });
+    }
+    return !premier;
+  }
+
+  // Pendant l'attente de la vidéo ou de la validation, le formulaire est figé.
+  function figer(oui) {
+    form.querySelectorAll("fieldset").forEach(function (fs) { fs.disabled = oui; });
+    bouton.disabled = oui;
+    if (!oui) boutonTxt.textContent = "Envoyer mon highlight";
+  }
+  function donnees() {
+    return {
+      nom: el.nom.value, pseudo: el.pseudo.value, reseau: el.reseau.value, email: el.email.value,
+      pays: el.pays.value, ville: el.ville.value, age: el.age.value,
+      parentNom: el.parentNom.value, parentEmail: el.parentEmail.value, parentOk: el.parentOk.checked,
+      commentaire: el.commentaire.value,
+      droits: el.droits.checked, personnes: el.personnes.checked, infos: el.infos.checked,
+      site: el.site.value
+    };
+  }
+
+  function finaliser() {
+    var e = envoi;
+    boutonTxt.textContent = "Validation…";
+    appeler("terminerEnvoi", e.id, e.idFichier || "", donnees()).then(function () {
+      soumis = false;
+      byId("merci-ref").textContent = e.id;
+      byId("merci-parent").hidden = el.age.value !== "Moins de 18 ans";
+      saisie.hidden = true;
+      merci.hidden = false;
+      merci.focus({ preventScroll: true });
+      merci.scrollIntoView({ block: "center", behavior: "smooth" });
+      document.title = "C'est envoyé — visu";
+    }).catch(function (err) {
+      var msg = (err && err.message) || "La validation a échoué. Vérifie ta connexion et réessaie.";
+      soumis = false;
+      figer(false);
+      afficherErreur(msg);
+      if (/Choisis à nouveau ta vidéo/.test(msg)) abandonner();
+    });
+  }
+
+  form.addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    if (soumis) return;
+    afficherErreur("");
+    if (!valider()) return afficherErreur("Il manque encore quelque chose : regarde les champs signalés.");
+    soumis = true;
+    figer(true);
+    if (envoi.etat === "fini") return finaliser();
+    boutonTxt.textContent = "Envoi de la vidéo…";
+    demarrerSiPret();
+  });
+
+  // Un autre clip : on garde l'identité, on redemande la vidéo et les accords.
+  byId("encore").addEventListener("click", function () {
+    figer(false);
+    abandonner();
+    el.droits.checked = el.personnes.checked = false;
+    el.commentaire.value = "";
+    afficherErreur("");
+    merci.hidden = true;
+    saisie.hidden = false;
+    form.scrollIntoView({ block: "start" });
+  });
+
+  // Apparition douce des blocs.
+  var blocs = document.querySelectorAll(".apparait");
+  if ("IntersectionObserver" in window) {
+    var obs = new IntersectionObserver(function (entrees) {
+      entrees.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add("vu"); obs.unobserve(e.target); }
+      });
+    }, { rootMargin: "0px 0px -8% 0px" });
+    blocs.forEach(function (b) { obs.observe(b); });
+  } else {
+    blocs.forEach(function (b) { b.classList.add("vu"); });
+  }
+</script>
+</body>
+</html>
